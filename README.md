@@ -1,15 +1,35 @@
-# account-book
+# finance
 应该2周内能提交
 
 上周完成情况：
-	1 后端+数据库 基本完成 
-	2 前端用户界面 只完成几个组件 (注册 登陆 记账 显示记账 排序 )  还差(图形表格 导航 以及各个组件的链接) 
-	3 前端管理员界面 还没开工
+1 后端+数据库 基本完成 
+2 前端用户界面 只完成几个组件 (注册 登陆 记账 显示记账 排序 )  还差(图形表格 导航 以及各个组件的链接) 
+3 前端管理员界面 还没开工
 
-本周计划 :
-	周二前完成 导航 图形表格 并且将用户界面几个组件拼接起来  	周三完成 各个组件间的通信 	（空余时间在某种程度可以说多）
-	周四 开工 管理员界面 估计就放上1个组件 那个清账    (课设要答辩，数字电路要小测) 
-	周五 可以的话完善管理员界面其他各个功能	（空余时间多）
-	周六 周日 周一 看到时候缺哪些 补哪些吧   （空余时间多 多 多） 
-		
-	
+
+
+> A Vue.js project
+
+## Build Setup
+
+``` bash
+# install dependencies
+npm install
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+
+# build for production and view the bundle analyzer report
+npm run build --report
+
+# run e2e tests
+npm run e2e
+
+# run all tests
+npm test
+```
+
+For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
