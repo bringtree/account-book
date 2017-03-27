@@ -1,0 +1,284 @@
+<template>
+  <section class="timeline-container timeline">
+    <button @click="sort"></button>
+    <div v-for="point in account" class="timeline-block">
+      <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
+      </div>
+
+      <div class="timeline-content">
+        <h2 v-text="point.thing"></h2>
+        <p v-text="point.money"></p>
+        <span v-if="point.date" v-text="point.date"></span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script type="text/ecmascript-6">
+  export default{
+    props: {
+      points: {
+      }
+    },
+    data(){
+      return {
+        account:this.points,
+        color:["green","red","yellow",'blue']
+      }
+    },
+    methods:{
+      sort:function (value) {
+        if(value == 'date') {
+          this.account.sort(function (a, b) {
+            return b.date.localeCompare(a.date);
+          })
+        }
+        if(value == 'money'){
+          this.account.sort(function (a, b) {
+            return b.money>a.money;
+          })
+        }
+      }
+    }
+  }
+
+</script>
+
+<style scoped>
+  .timeline-container {
+    /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
+    width: 90%;
+    max-width: 1170px;
+    margin: 0 auto;
+  }
+
+  .timeline-container::after {
+    /* clearfix */
+    content: '';
+    display: table;
+    clear: both;
+  }
+
+
+  .timeline {
+    position: relative;
+    padding: 2em 0;
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  .timeline::before {
+    /* this is the vertical line */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 18px;
+    height: 100%;
+    width: 4px;
+    background: rgb(32,160,255);
+  }
+
+  @media only screen and (min-width: 1170px) {
+    .timeline {
+      margin-top: 3em;
+      margin-bottom: 3em;
+    }
+
+    .timeline::before {
+      left: 50%;
+      margin-left: -2px;
+    }
+  }
+
+  .timeline-block {
+    position: relative;
+    margin: 2em 0;
+  }
+
+  .timeline-block:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .timeline-block:first-child {
+    margin-top: 0;
+  }
+
+  .timeline-block:last-child {
+    margin-bottom: 0;
+  }
+
+  @media only screen and (min-width: 1170px) {
+    .timeline-block {
+      margin: 4em 0;
+    }
+
+    .timeline-block:first-child {
+      margin-top: 0;
+    }
+
+    .timeline-block:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .timeline-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px white, inset 0 2px 0 rgba(0, 0, 0, 0.08), 0 3px 0 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .timeline-img img {
+    display: block;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    margin-left: -12px;
+    margin-top: -12px;
+  }
+
+  .timeline-img.green {
+    background: #75ce66;
+  }
+
+  .timeline-img.red {
+    background: #c03b44;
+  }
+
+  .timeline-img.yellow {
+    background: #f0ca45;
+  }
+
+  .timeline-img.blue {
+    background: #00bbff;
+  }
+
+  @media only screen and (min-width: 1170px) {
+    .timeline-img {
+      width: 60px;
+      height: 60px;
+      left: 50%;
+      margin-left: -30px;
+      /* Force Hardware Acceleration in WebKit */
+      -webkit-transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+    }
+
+    .cssanimations .timeline-img.is-hidden {
+      visibility: hidden;
+    }
+
+    .cssanimations .timeline-img.bounce-in {
+      visibility: visible;
+      -webkit-animation: bounce-1 0.6s;
+      -moz-animation: bounce-1 0.6s;
+      animation: bounce-1 0.6s;
+    }
+  }
+
+  .timeline-content {
+    position: relative;
+    margin-left: 60px;
+    background: white;
+    border-radius: 0.25em;
+    padding: 1em;
+    border:3px solid  rgb(33,160,255);
+    box-shadow: 0 3px 0 #d7e4ed;
+  }
+
+  .timeline-content:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .timeline-content h2 {
+    color: #303e49;
+  }
+
+
+
+  .timeline-content::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    right: 100%;
+    height: 0;
+    width: 0;
+    border: 7px solid transparent;
+    border-right: 7px solid white;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .timeline-content h2 {
+      font-size: 20px;
+      font-size: 1.25rem;
+    }
+
+    .timeline-content p {
+      font-size: 16px;
+      font-size: 1rem;
+    }
+
+
+  }
+
+  @media only screen and (min-width: 1170px) {
+    .timeline-content {
+      margin-left: 0;
+      padding: 1.6em;
+      width: 45%;
+    }
+
+    .timeline-content::before {
+      top: 24px;
+      left: 100%;
+      border-color: transparent;
+      border-left-color: white;
+    }
+
+
+    .timeline-block:nth-child(even) .timeline-content {
+      float: right;
+    }
+
+    .timeline-block:nth-child(even) .timeline-content::before {
+      top: 24px;
+      left: auto;
+      right: 100%;
+      border-color: transparent;
+      border-right-color: white;
+    }
+
+
+
+    .cssanimations .timeline-content.is-hidden {
+      visibility: hidden;
+    }
+
+    .cssanimations .timeline-content.bounce-in {
+      visibility: visible;
+      -webkit-animation: bounce-2 0.6s;
+      -moz-animation: bounce-2 0.6s;
+      animation: bounce-2 0.6s;
+    }
+  }
+
+  @media only screen and (min-width: 1170px) {
+    /* inverse bounce effect on even content blocks */
+    .cssanimations .timeline-block:nth-child(even) .timeline-content.bounce-in {
+      -webkit-animation: bounce-2-inverse 0.6s;
+      -moz-animation: bounce-2-inverse 0.6s;
+      animation: bounce-2-inverse 0.6s;
+    }
+  }
+
+</style>
+
