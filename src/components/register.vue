@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="register">
     <el-form label-width="100px" class="demo-ruleForm" :rules="rules2" :model="ruleForm2">
       <el-form-item label="称呼" prop="user">
         <el-input v-model="ruleForm2.user"></el-input>
@@ -82,6 +82,7 @@
       },
       submit: function () {
         const that = this;
+        console.log(this)
         this.$http.post('/register', this.ruleForm2)
           .then(function (res) {
               that.$message({
@@ -97,5 +98,8 @@
 </script>
 
 <style scoped>
-
+  #register{
+    margin-top:10%;
+    margin-right:15%;
+  }
 </style>

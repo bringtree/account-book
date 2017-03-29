@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="addCount">
     <el-form ref="form" :model="form" label-width="80px">
       <el-form-item label="Thing:"
                     prop="thing"
@@ -101,6 +101,8 @@
 </script>
 
 <style scoped>
-
+#addCount{
+  margin-top: 30px;
+}
 
 </style>

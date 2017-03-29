@@ -1,12 +1,14 @@
 <template>
+
   <section class="timeline-container timeline">
-    <el-radio class="radio" v-model="radio" label="date">按时间排序</el-radio>
-    <el-radio class="radio" v-model="radio" label="money">按金额排序</el-radio>
-    <el-radio class="radio" v-model="radio" label="status">按类型排序</el-radio>
+    <div style="float:right">
+      <el-radio class="radio" v-model="radio" label="date">按时间排序</el-radio>
+      <el-radio class="radio" v-model="radio" label="money">按金额排序</el-radio>
+      <el-radio class="radio" v-model="radio" label="status">按类型排序</el-radio>
+    </div>
     <div v-for="point in account" class="timeline-block">
       <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
       </div>
-
       <div class="timeline-content">
         <h2 v-text="point.thing"></h2>
         <p v-text="point.money"></p>
@@ -18,19 +20,17 @@
 
 <script type="text/ecmascript-6">
   export default{
-    props: {
-      points: {}
-    },
+
     data(){
       return {
-        account: this.points,
+        account: [],
         color: ["green", "red", "yellow", 'blue'],
         radio: '1'
       }
     },
     watch: {
       radio: function (value) {
-        console.log(value)
+        console.log(value);
         if (value == 'date') {
           this.account.sort(function (a, b) {
             return b.date.localeCompare(a.date);
@@ -41,14 +41,21 @@
             return b.money > a.money;
           })
         }
-        if(value=='status'){
-          this.account.sort(function (a,b) {
-            return b.status<a.status
+        if (value == 'status') {
+          this.account.sort(function (a, b) {
+            return b.status < a.status
           })
         }
       }
     },
-    methods: {}
+    methods: {},
+
+    mounted: function () {
+      var that = this;
+      this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
+        that.account = res.data;
+      })
+    }
 
   }
 

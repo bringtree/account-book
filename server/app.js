@@ -240,7 +240,7 @@ router.get('/user/api/income/:username', async (ctx) => {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": "true"
   };
-  var body =[];
+  var body = [];
   var username = ctx.params.username;
   if (ctx.session.current_user.username == username) {
     var result1 = await UserModel.findByUsername(username)
@@ -248,13 +248,13 @@ router.get('/user/api/income/:username', async (ctx) => {
       for (var i = 0; i < result1.accounts.length; i++) {
         if (result1.accounts[i].status == 1 || result1.accounts[i].status == 2)
           body.push(result1.accounts[i]);
-          console.log(result1.accounts[i])
+        console.log(result1.accounts[i])
       }
     }
     else {
-      body={
-        type:'error',
-        info:"check out your login status"
+      body = {
+        type: 'error',
+        info: "check out your login status"
       };
     }
   }
@@ -262,50 +262,72 @@ router.get('/user/api/income/:username', async (ctx) => {
   ctx.body = body;
 });
 router.get('/user/api/outcome/:username', async (ctx) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var body = [];
   var username = ctx.params.username;
-  //验证session
   if (ctx.session.current_user.username == username) {
-    let body = [];
-    await UserModel.findByUsername(username, function (err, doc) {
-      if (err) {
-        console.log(err);
+    var result1 = await UserModel.findByUsername(username)
+    if (result1) {
+      for (var i = 0; i < result1.accounts.length; i++) {
+        if (result1.accounts[i].status == 3 || result1.accounts[i].status == 4)
+          body.push(result1.accounts[i]);
+        console.log(result1.accounts[i])
       }
-      else {
-        for (var i = 0; i < doc.accounts.length; i++) {
-          if (doc.accounts[i].status == 3 || doc.accounts[i].status == 4)
-            body.push(doc.accounts[i]);
-        }
-        console.log(body)
-      }
-    })
-    JSON.stringify(body);
-    ctx.body = body;
+    }
+    else {
+      body = {
+        type: 'error',
+        info: "check out your login status"
+      };
+    }
   }
-
+  JSON.stringify(body);
+  ctx.body = body;
 });
 router.get('/user/api/allcome/:username', async (ctx) => {
-  var username = ctx.params.username;
-  console.log()
-  //验证session
-  if (ctx.session.current_user.username == username) {
-    let body = [];
-    await UserModel.findByUsername(username, function (err, doc) {
-      if (err) {
-        console.log(err);
+    ctx.response.header = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true"
+    };
+    var body = [];
+    var username = ctx.params.username;
+    if (ctx.session.current_user.username == username) {
+      var result1 = await UserModel.findByUsername(username)
+      if (result1) {
+        for (var i = 0; i < result1.accounts.length; i++) {
+          body.push(result1.accounts[i]);
+          console.log(result1.accounts[i])
+        }
+
       }
       else {
-        for (var i = 0; i < doc.accounts.length; i++) {
-          if (doc.accounts[i].status == 3 || doc.accounts[i].status == 4 || doc.accounts[i].status == 1 || doc.accounts[i].status == 2)
-            body.push(doc.accounts[i]);
-        }
-        console.log(body)
+        body = {
+          type: 'error',
+          info: "check out your login status"
+        };
       }
-    })
-    JSON.stringify(body);
-    ctx.body = body;
+      JSON.stringify(body);
+      ctx.body = body;
+    }
   }
+);
 
-});
+router.get('/user/api/clear', async (ctx) => {
+    ctx.response.header = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true"
+    };
+    ctx.session=null;
+    ctx.body={
+      "type":"success",
+      "info":"clear cookie success"
+    }
+  }
+);
+
 //此处是迷乱中写的session 验证 未验证 不可信
 router.post('/user/api/del/:username', async (ctx) => {
   var username = ctx.params.username;

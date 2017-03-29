@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div id="login">
     <el-form ref="form" :model="form" label-width="100px">
       <el-form-item label="账号">
         <el-input v-model="form.username"></el-input>
@@ -22,35 +22,39 @@
 
   export default {
     data(){
-      return{
-        form:{
-          username:'',
-          password:''
+      return {
+        form: {
+          username: '',
+          password: ''
         }
       }
     },
-    methods:{
-      submit:function () {
+    methods: {
+      submit: function () {
         const that = this;
-        this.$http.post("/login",this.form)
+        this.$http.post("/login", this.form)
           .then(function (res) {
-            if(res.status==200){
+            if (res.status == 200) {
               that.$message({
-                showClose:true,
-                type:res.data.type||"error",
-                message:res.data.message
+                showClose: true,
+                type: res.data.type || "error",
+                message: res.data.message
               })
+              if(res.data.type=="success"){
+                router.push("menu")
+              }
             }
 
           })
           .catch(function (err) {
             that.$message({
-              showClose:true,
-              type:"error",
-              message:"let us check out our network"
-            })          })
+              showClose: true,
+              type: "error",
+              message: "let us check out our network"
+            })
+          })
       },
-      register:function () {
+      register: function () {
         router.push("register")
 
       }
@@ -58,6 +62,9 @@
   }
 </script>
 
-<style>
-
+<style scoped>
+  #login {
+    margin-top: 10%;
+    margin-right: 15%;
+  }
 </style>
