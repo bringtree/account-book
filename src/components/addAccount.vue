@@ -66,7 +66,33 @@
     methods: {
       onSubmit()
       {
-        console.log('submit!');
+        var that = this;
+        if(this.form.thing&&this.form.status&&this.form.date&&this.form.money){
+          this.$http.post('/user/api/add/', this.form)
+            .then(function (res) {
+              if(res.status==200){
+                that.$message({
+                  showClose:true,
+                  type:res.data.type||"error",
+                  message:res.data.message
+                })
+              }
+
+            })
+            .catch((err) => {
+              that.$message({
+                showClose:true,
+                type:"error",
+                message:err
+              })
+            })
+        }else{
+          that.$message({
+            showClose:true,
+            type:"error",
+            message:"check out your input"
+          })
+        }
       }
     }
 

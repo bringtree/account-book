@@ -5,14 +5,18 @@ const UserModel = require('./models/user').UserModel;
 const UserSchema = require('./models/user').UserSchema;
 const Koa = require('koa');
 const app = new Koa();
+const csrf = require('koa-csrf');
 const bodyParser = require('koa-bodyparser');
 const session = require('koa-generic-session');
 const MongoStore = require('koa-generic-session-mongo');
 const router = require('koa-router')();
 const convert = require('koa-convert');
-
+const cors = require("koa-cors");
+// var Promise = require("bluebird");
 
 app.use(bodyParser());
+app.use(cors());
+
 
 //session
 app.keys = ['keys', 'keykeys'];
@@ -22,6 +26,7 @@ app.use(session({
     ttl: 60000,
   })
 }));
+// app.use(new csrf());
 
 
 /* test data001*/
@@ -79,17 +84,20 @@ var test = new UserModel({
       }]
   }
 );
-test.save(function (err, log) {
-  if (err) {
-    console.log('save error:' + err);
-  } else
-    console.log('save success\n' + log);
-});
-/* end */
+// test.save(function (err, log) {
+//   if (err) {
+//     console.log('save error:' + err);
+//   } else
+//     console.log('save success\n' + log);
+// });
+// /* end */
 
 
 router.post('/register', async (ctx) => {
-
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
   let session = ctx.session;
   let body = ctx.request.body;
   let user = new UserModel({
@@ -103,7 +111,7 @@ router.post('/register', async (ctx) => {
   };
   if (user.username && user.password && user.name) {
     await user.save(function (err, doc) {
-      if (err!=null) {
+      if (err != null) {
         resBody.type = "error";
         resBody.message = 'check out your input,do you feel my angry :(';
         // return ctx.redirect('/404')
@@ -122,40 +130,45 @@ router.post('/register', async (ctx) => {
     resBody.type = "error";
     resBody.message = 'check out your input,do you feel my angry :(';
   }
-
   ctx.body = resBody
 });
 router.post('/login', async (ctx) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  let session = ctx.session;
+
   let body = ctx.request.body;
   let user = {
     username: body.username,
     password: body.password
   };
   let resBody = {
-    type:"",
-    message:""
+    type: "",
+    message: ""
   };
-  await UserModel.findByUsername(user.username, (err, doc) => {
-    if (doc==null) {
-      resBody.type = 'error';
-      resBody.message = "i can't find your username ,did you register?";
+  var result1 = await UserModel.findByUsername(user.username)
+  if (result1 == null) {
+    resBody.type = 'error';
+    resBody.message = "i can't find your username ,did you register?";
+  }
+  if (result1 != null) {
+    if (user.password === result1.password) {
+      resBody.type = "success";
+      resBody.message = "login success"
+      // return ctx.redirect()
+      session.current_user = {
+        username: body.username,
+        password: body.password
+      };
     }
-    if(doc!=null) {
-      if (user.password === doc.password) {
-          resBody.type = "success";
-          resBody.message = "login success"
-          // return ctx.redirect()
-      }
-      else {
-        resBody.type = "error";
-        resBody.message = "check out your passwords";
-      }
+    else {
+      resBody.type = "error";
+      resBody.message = "check out your passwords";
     }
-    console.log(doc)
-    console.log(err)
-  });
-  console.log(resBody)
-  ctx.body= resBody;
+  }
+  ctx.body = resBody;
 });
 router.post('/user/api/checkusername', async (ctx) => {
   let body = ctx.request.body;
@@ -165,23 +178,23 @@ router.post('/user/api/checkusername', async (ctx) => {
   let resBody = {
     message: ""
   };
-  await UserModel.findByUsername(user.username, (err, doc) => {
-    if (err!=null) {
-      console.log(err);
-    }
-    else {
-      if (doc == null) {
-        resBody.message = 'access'
-      }
-      else {
-        resBody.message = 'repeat'
-      }
-    }
-  });
+  var result1 = await UserModel.findByUsername(user.username);
+  if (result1) {
+    resBody.message = 'repeat'
+  }
+  else {
+    resBody.message = 'access'
+  }
+
   ctx.body = resBody;
-});
-router.post('/user/api/add/:username', async (ctx) => {
-  var username = ctx.params.username;
+})
+;
+router.post('/user/api/add', async (ctx, next) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var username = ctx.session.current_user.username;
   var oldAccount = "";
   var account = {
     thing: ctx.request.body.thing,
@@ -189,50 +202,69 @@ router.post('/user/api/add/:username', async (ctx) => {
     status: ctx.request.body.status,
     money: ctx.request.body.money
   };
-  await UserModel.findByUsername(username, function (err, doc) {
-    if (err) {
-      console.log(err);
-    }
-    oldAccount = doc.accounts;
+
+  var resBody = {};
+  var result1 = await UserModel.findByUsername(username);
+  if (result1) {
+    oldAccount = result1.accounts;
     oldAccount.push(account);
-  });
-
-  UserModel.addAccount(username, oldAccount, function (err, doc) {
-    if (err) {
-      console.log(err);
+  } else {
+    console.log(err);
+    resBody = {
+      type: "fail",
+      message: "please check out your login status or input"
     }
-    console.log(doc)
-  })
+  }
 
+  var result2 = await UserModel.addAccount(username, oldAccount);
+  if (result2) {
+    resBody = {
+      type: "success",
+      message: "input success"
+    };
+
+  }
+  else {
+    resBody = {
+      type: "fail",
+      message: "please check out your login status or input"
+    }
+  }
+  console.log(oldAccount)
+  console.log(result2)
+  ctx.body = resBody
 
 });
 router.get('/user/api/income/:username', async (ctx) => {
-
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var body =[];
   var username = ctx.params.username;
-  //验证session
-  if (1) {
-    let body = [];
-    await UserModel.findByUsername(username, function (err, doc) {
-      if (err) {
-        console.log(err);
+  if (ctx.session.current_user.username == username) {
+    var result1 = await UserModel.findByUsername(username)
+    if (result1) {
+      for (var i = 0; i < result1.accounts.length; i++) {
+        if (result1.accounts[i].status == 1 || result1.accounts[i].status == 2)
+          body.push(result1.accounts[i]);
+          console.log(result1.accounts[i])
       }
-      else {
-        for (var i = 0; i < doc.accounts.length; i++) {
-          if (doc.accounts[i].status == 1 || doc.accounts[i].status == 2)
-            body.push(doc.accounts[i]);
-        }
-        console.log(body)
-      }
-    })
-    JSON.stringify(body);
-    ctx.body = body;
+    }
+    else {
+      body={
+        type:'error',
+        info:"check out your login status"
+      };
+    }
   }
-
+  JSON.stringify(body);
+  ctx.body = body;
 });
 router.get('/user/api/outcome/:username', async (ctx) => {
   var username = ctx.params.username;
   //验证session
-  if (1) {
+  if (ctx.session.current_user.username == username) {
     let body = [];
     await UserModel.findByUsername(username, function (err, doc) {
       if (err) {
@@ -253,8 +285,9 @@ router.get('/user/api/outcome/:username', async (ctx) => {
 });
 router.get('/user/api/allcome/:username', async (ctx) => {
   var username = ctx.params.username;
+  console.log()
   //验证session
-  if (1) {
+  if (ctx.session.current_user.username == username) {
     let body = [];
     await UserModel.findByUsername(username, function (err, doc) {
       if (err) {
@@ -262,7 +295,7 @@ router.get('/user/api/allcome/:username', async (ctx) => {
       }
       else {
         for (var i = 0; i < doc.accounts.length; i++) {
-          if (doc.accounts[i].status == 3 || doc.accounts[i].status == 4||doc.accounts[i].status == 1||doc.accounts[i].status == 2)
+          if (doc.accounts[i].status == 3 || doc.accounts[i].status == 4 || doc.accounts[i].status == 1 || doc.accounts[i].status == 2)
             body.push(doc.accounts[i]);
         }
         console.log(body)
@@ -273,15 +306,18 @@ router.get('/user/api/allcome/:username', async (ctx) => {
   }
 
 });
+//此处是迷乱中写的session 验证 未验证 不可信
 router.post('/user/api/del/:username', async (ctx) => {
   var username = ctx.params.username;
   var id = ctx.request.body.id;
-  UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}, function (err, doc) {
-    if (err) {
-      console.log(err);
-    }
-    console.log(doc);
-  })
+  if (ctx.session.current_user.username == username) {
+    UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}, function (err, doc) {
+      if (err) {
+        console.log(err);
+      }
+      console.log(doc);
+    })
+  }
 });
 
 app

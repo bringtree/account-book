@@ -2,7 +2,10 @@
   "name": "application-name",
   "version": "0.0.1",
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "kcors": "^2.2.1",
     "koa": "^4.1.2",
+    "koa-csrf": "^3.0.5",
     "koa-generic-session": "^1.11.5",
     "koa-generic-session-mongo": "^0.3.1",
     "koa-router": "^7.1.0",

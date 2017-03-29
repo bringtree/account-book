@@ -1,6 +1,8 @@
 <template>
   <section class="timeline-container timeline">
-    <button @click="sort"></button>
+    <el-radio class="radio" v-model="radio" label="date">按时间排序</el-radio>
+    <el-radio class="radio" v-model="radio" label="money">按金额排序</el-radio>
+    <el-radio class="radio" v-model="radio" label="status">按类型排序</el-radio>
     <div v-for="point in account" class="timeline-block">
       <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
       </div>
@@ -17,29 +19,37 @@
 <script type="text/ecmascript-6">
   export default{
     props: {
-      points: {
-      }
+      points: {}
     },
     data(){
       return {
-        account:this.points,
-        color:["green","red","yellow",'blue']
+        account: this.points,
+        color: ["green", "red", "yellow", 'blue'],
+        radio: '1'
       }
     },
-    methods:{
-      sort:function (value) {
-        if(value == 'date') {
+    watch: {
+      radio: function (value) {
+        console.log(value)
+        if (value == 'date') {
           this.account.sort(function (a, b) {
             return b.date.localeCompare(a.date);
           })
         }
-        if(value == 'money'){
+        if (value == 'money') {
           this.account.sort(function (a, b) {
-            return b.money>a.money;
+            return b.money > a.money;
+          })
+        }
+        if(value=='status'){
+          this.account.sort(function (a,b) {
+            return b.status<a.status
           })
         }
       }
-    }
+    },
+    methods: {}
+
   }
 
 </script>
@@ -59,7 +69,6 @@
     clear: both;
   }
 
-
   .timeline {
     position: relative;
     padding: 2em 0;
@@ -75,7 +84,7 @@
     left: 18px;
     height: 100%;
     width: 4px;
-    background: rgb(32,160,255);
+    background: rgb(32, 160, 255);
   }
 
   @media only screen and (min-width: 1170px) {
@@ -189,7 +198,7 @@
     background: white;
     border-radius: 0.25em;
     padding: 1em;
-    border:3px solid  rgb(33,160,255);
+    border: 3px solid rgb(33, 160, 255);
     box-shadow: 0 3px 0 #d7e4ed;
   }
 
@@ -202,8 +211,6 @@
   .timeline-content h2 {
     color: #303e49;
   }
-
-
 
   .timeline-content::before {
     content: '';
@@ -227,7 +234,6 @@
       font-size: 1rem;
     }
 
-
   }
 
   @media only screen and (min-width: 1170px) {
@@ -244,7 +250,6 @@
       border-left-color: white;
     }
 
-
     .timeline-block:nth-child(even) .timeline-content {
       float: right;
     }
@@ -256,8 +261,6 @@
       border-color: transparent;
       border-right-color: white;
     }
-
-
 
     .cssanimations .timeline-content.is-hidden {
       visibility: hidden;

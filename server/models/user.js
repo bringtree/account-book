@@ -32,12 +32,12 @@ var UserSchema = new mongoose.Schema({
 /*end */
 
 //statics 扩展
-UserSchema.statics.findByUsername = function (username, cb) {
-  return this.findOne({username: username}, cb);
+UserSchema.statics.findByUsername = function (username) {
+  return this.findOne({username: username}).exec();
 }
 
-UserSchema.statics.addAccount = function(username,account,cb){
-  return this.findOneAndUpdate({username:username},{"accounts":account},cb);
+UserSchema.statics.addAccount = function(username,account){
+  return this.findOneAndUpdate({username:username},{"accounts":account}).exec();
 }
 
 // UserSchema.statics.delAccount = function (username,) {
