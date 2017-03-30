@@ -13,11 +13,24 @@ Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Axios.defaults.headers.common["Access-Control-Allow-Credentials"]="true";
 
-Vue.prototype.$http = Axios
+Vue.prototype.$http = Axios;
 
-// router.beforeEach((to,from,next) =>{
-//
-// });
+router.beforeEach((to,from,next) =>{
+  if(to.path!='/register'){
+    Axios.get('/user/api/state')
+      .then(function (res) {
+        if(res.data.type=="success"){
+          next();
+        }
+        else{
+          next('/login')
+        }
+      })
+  }
+  next();
+
+
+});
 
 /* eslint-disable no-new */
  new Vue({

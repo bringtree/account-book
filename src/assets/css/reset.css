@@ -55,6 +55,9 @@ table {
 .rf{
   float:right;
 }
+.clear{
+  clear:both;
+}
 a{
   text-decoration:none
 }

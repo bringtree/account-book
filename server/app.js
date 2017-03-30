@@ -110,22 +110,21 @@ router.post('/register', async (ctx) => {
     message: ""
   };
   if (user.username && user.password && user.name) {
-    await user.save(function (err, doc) {
-      if (err != null) {
-        resBody.type = "error";
-        resBody.message = 'check out your input,do you feel my angry :(';
-        // return ctx.redirect('/404')
-      }
-      else {
+    try {
+      var result = await user.save();
+      if (result) {
         session.current_user = {
           username: body.username,
           password: body.password
         };
         resBody.type = 'success';
         resBody.message = 'register success, your are bang bang';
-        // return ctx.redirect('/')
       }
-    })
+    }
+    catch (err) {
+      resBody.type = "error";
+      resBody.message = 'check out your input,do you feel my angry :(';
+    }
   } else {
     resBody.type = "error";
     resBody.message = 'check out your input,do you feel my angry :(';
@@ -187,8 +186,7 @@ router.post('/user/api/checkusername', async (ctx) => {
   }
 
   ctx.body = resBody;
-})
-;
+});
 router.post('/user/api/add', async (ctx, next) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
@@ -288,42 +286,62 @@ router.get('/user/api/outcome/:username', async (ctx) => {
   ctx.body = body;
 });
 router.get('/user/api/allcome/:username', async (ctx) => {
-    ctx.response.header = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": "true"
-    };
-    var body = [];
-    var username = ctx.params.username;
-    if (ctx.session.current_user.username == username) {
-      var result1 = await UserModel.findByUsername(username)
-      if (result1) {
-        for (var i = 0; i < result1.accounts.length; i++) {
-          body.push(result1.accounts[i]);
-          console.log(result1.accounts[i])
-        }
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var body = [];
+  var username = ctx.params.username;
+  if (ctx.session.current_user.username == username) {
+    var result1 = await UserModel.findByUsername(username)
+    if (result1) {
+      for (var i = 0; i < result1.accounts.length; i++) {
+        body.push(result1.accounts[i]);
+        console.log(result1.accounts[i])
+      }
 
-      }
-      else {
-        body = {
-          type: 'error',
-          info: "check out your login status"
-        };
-      }
-      JSON.stringify(body);
-      ctx.body = body;
+    }
+    else {
+      body = {
+        type: 'error',
+        info: "check out your login status"
+      };
+    }
+    JSON.stringify(body);
+    ctx.body = body;
+  }
+});
+router.get('/user/api/state', async (ctx) => {
+
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  try {
+    var name = ctx.session.current_user.username;
+    ctx.body = {
+      "type": "success",
+      "info": "access"
     }
   }
-);
+  catch (e) {
+    ctx.body = {
+      "type": "false",
+      "info": "noPass"
+    }
+  }
+
+})
 
 router.get('/user/api/clear', async (ctx) => {
     ctx.response.header = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": "true"
     };
-    ctx.session=null;
-    ctx.body={
-      "type":"success",
-      "info":"clear cookie success"
+    ctx.session = null;
+    ctx.body = {
+      "type": "success",
+      "message": "clear cookie success"
     }
   }
 );

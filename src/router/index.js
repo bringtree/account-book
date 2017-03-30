@@ -4,7 +4,6 @@ import Register from '@/components/register'
 import Login from '@/components/login'
 import Account from '@/components/accountLine'
 import addAccount from '../components/addAccount'
-import accountIncome from '../components/accountIncome'
 import accountExart from '../components/accountExart.vue'
 import accountChart from '../components/accountChart.vue'
 import menu from '../components/menu.vue'
@@ -33,10 +32,6 @@ export default new Router({
         {
           path:'accountline',
           component:Account
-        },
-        {
-          path:"accountincome",
-          component:accountIncome
         },
         {
           path:"accountextra",

@@ -1,18 +1,29 @@
 <template>
 
   <section class="timeline-container timeline">
-    <div style="float:right">
-      <el-radio class="radio" v-model="radio" label="date">按时间排序</el-radio>
-      <el-radio class="radio" v-model="radio" label="money">按金额排序</el-radio>
-      <el-radio class="radio" v-model="radio" label="status">按类型排序</el-radio>
+    <div class="submenu">
+      <el-checkbox-group v-model="stateMode" class="lf">
+        <el-checkbox label="收入"></el-checkbox>
+        <el-checkbox label="清账收入"></el-checkbox>
+        <el-checkbox label="支出"></el-checkbox>
+        <el-checkbox label="清账支出"></el-checkbox>
+      </el-checkbox-group>
+
+      <div class="rf">
+        <el-radio class="radio" v-model="sortMode" label="date">按时间排序</el-radio>
+        <el-radio class="radio" v-model="sortMode" label="money">按金额排序</el-radio>
+        <el-radio class="radio" v-model="sortMode" label="status">按类型排序</el-radio>
+      </div>
+      <div class="clear"></div>
     </div>
+
     <div v-for="point in account" class="timeline-block">
       <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
       </div>
       <div class="timeline-content">
-        <h2 v-text="point.thing"></h2>
-        <p v-text="point.money"></p>
-        <span v-if="point.date" v-text="point.date"></span>
+        <h2>{{point.thing}}</h2>
+        <p>{{point.money}}</p>
+        <span>{{point.date}}</span>
       </div>
     </div>
   </section>
@@ -25,11 +36,13 @@
       return {
         account: [],
         color: ["green", "red", "yellow", 'blue'],
-        radio: '1'
+        sortMode: '1',
+        stateMode: ['0', '收入', '清账收入', '支出', '清账支出'],
+        stateCode:[]
       }
     },
     watch: {
-      radio: function (value) {
+      sortMode: function (value) {
         console.log(value);
         if (value == 'date') {
           this.account.sort(function (a, b) {
@@ -46,10 +59,36 @@
             return b.status < a.status
           })
         }
+      },
+      stateMode: function (state) {
+        var type = new Array();
+        type.push('0');
+        var foo = function (chineseType,numType) {
+          if (state.indexOf(chineseType) > 0) {
+            if (type.indexOf(numType) < 0) {
+              type.push(numType);
+            }
+          }else{
+            if (type.indexOf(numType) > 0) {
+              type.pop(numType);
+            }
+          }
+        };
+        foo('收入','1');
+        foo('清账收入','2');
+        foo('支出','3');
+        foo('清账支出','4');
+        this.stateCode = type;
+        // stateMode ->  type -> <- account[] <- time
       }
     },
     methods: {},
-
+    computed:{
+      account:function (value) {
+        let stateCode = this.stateCode
+//          return value
+        }
+    },
     mounted: function () {
       var that = this;
       this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
@@ -87,7 +126,7 @@
     /* this is the vertical line */
     content: '';
     position: absolute;
-    top: 0;
+    top: 10%;
     left: 18px;
     height: 100%;
     width: 4px;

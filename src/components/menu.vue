@@ -7,15 +7,9 @@
         </el-menu-item>
         <el-submenu index="1">
           <template slot="title">我的账单</template>
-          <el-menu-item index="/menu/accountline">近期总览
+          <el-menu-item index="/menu/accountline">总览
           </el-menu-item>
-          <el-menu-item index="/menu/">收入和支出
-          </el-menu-item>
-          <el-menu-item index="/menu/">清账收入
-          </el-menu-item>
-          <el-menu-item index="/menu/">支出
-          </el-menu-item>
-          <el-menu-item index="/menu/">清账支出
+          <el-menu-item index="/menu/">未清的帐
           </el-menu-item>
         </el-submenu>
         <el-menu-item index="/menu/">统计
@@ -42,23 +36,17 @@
       };
     },
     methods: {
-
       handleSelect:function(key, keyPath) {
-
         if ("/login" == key) {
           this.$http.get("/user/api/clear")
         }
-
       }
-
-
     }
-
-
   }
 </script>
 
 <style scoped>
+
   @import '../assets/css/reset.css';
 
 </style>
