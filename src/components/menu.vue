@@ -30,8 +30,6 @@
 
 <script type="text/ecmascript-6">
 
-  import{mapGetters,mapActions} from 'vuex'
-
 
   export default{
     data() {
@@ -45,14 +43,7 @@
           this.$http.get("/user/api/clear")
         }
       }
-    },
-    mounted: function () {
-      var that = this;
-      this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
-        that.$store.commit('u')
-        that.account = res.data;
-      });
-    },
+    }
   }
 </script>
 

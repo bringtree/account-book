@@ -48,6 +48,8 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import{mapGetters,mapActions} from 'vuex'
+
   export default{
 
     data(){
@@ -260,11 +262,10 @@
     },
     mounted: function () {
       var that = this;
-      this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
+      this.$http.get("http://localhost:8080/user/api/allcome/").then(function (res) {
+        that.$store.commit('update',{account:res.data})
         that.factor.account = res.data;
       });
-    },
-    updated: function () {
     }
 
   }

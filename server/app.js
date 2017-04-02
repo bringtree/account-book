@@ -290,31 +290,30 @@ router.get('/user/api/outcome/:username', async (ctx) => {
   JSON.stringify(body);
   ctx.body = body;
 });
-router.get('/user/api/allcome/:username', async (ctx) => {
+router.get('/user/api/allcome/', async (ctx) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": "true"
   };
   var body = [];
-  var username = ctx.params.username;
-  if (ctx.session.current_user.username == username) {
-    var result1 = await UserModel.findByUsername(username)
-    if (result1) {
-      for (var i = 0; i < result1.accounts.length; i++) {
-        body.push(result1.accounts[i]);
-        console.log(result1.accounts[i])
-      }
+  var username = ctx.session.current_user.username;
+  var result1 = await UserModel.findByUsername(username);
+  if (result1) {
+    for (var i = 0; i < result1.accounts.length; i++) {
+      body.push(result1.accounts[i]);
+      console.log(result1.accounts[i])
+    }
 
-    }
-    else {
-      body = {
-        type: 'error',
-        info: "check out your login status"
-      };
-    }
-    JSON.stringify(body);
-    ctx.body = body;
   }
+  else {
+    body = {
+      type: 'error',
+      info: "check out your login status"
+    };
+  }
+  JSON.stringify(body);
+  ctx.body = body;
+
 });
 router.get('/user/api/state', async (ctx) => {
 
@@ -350,33 +349,32 @@ router.get('/user/api/clear', async (ctx) => {
   }
 );
 
-router.post('/user/api/edi/',async(ctx)=>{
+router.post('/user/api/edi/', async (ctx) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": "true"
   };
   var username = ctx.session.current_user.username;
   var id = ctx.request.body._id
-  var result1,result2;
+  var result1, result2;
   try {
-    result1=await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
-    result2=await UserModel.update({'username': username}, {$push: {"accounts": ctx.request.body}}).exec();
-  }catch (err){
+    result1 = await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
+    result2 = await UserModel.update({'username': username}, {$push: {"accounts": ctx.request.body}}).exec();
+  } catch (err) {
     console.log(err);
   }
-  if(result1.nModified==1&&result2.nModified==1){
-    ctx.body={
-      type:'success',
-      message:'edit success'
+  if (result1.nModified == 1 && result2.nModified == 1) {
+    ctx.body = {
+      type: 'success',
+      message: 'edit success'
     }
   }
-  else{
-    ctx.body={
-      type:'error',
-      message:'edit fail'
+  else {
+    ctx.body = {
+      type: 'error',
+      message: 'edit fail'
     }
   }
-
 
 
 });
