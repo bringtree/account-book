@@ -15,9 +15,9 @@
     ]">
         <el-select v-model="form.status" placeholder="choose your accountType" style="width:100%">
           <el-option label="收入" value="1"></el-option>
-          <el-option label="清账收入" value="2"></el-option>
-          <el-option label="支出" value="3"></el-option>
-          <el-option label="记账支出" value="4"></el-option>
+          <el-option label="支出" value="2"></el-option>
+          <el-option label="已经清账" value="3"></el-option>
+          <el-option label="未清的帐" value="4"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="Time"
@@ -47,6 +47,13 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
+
+
+
+
+
+
+
   </div>
 </template>
 

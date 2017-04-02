@@ -84,13 +84,14 @@ var test = new UserModel({
       }]
   }
 );
+
 // test.save(function (err, log) {
 //   if (err) {
 //     console.log('save error:' + err);
 //   } else
 //     console.log('save success\n' + log);
 // });
-// /* end */
+/* end */
 
 
 router.post('/register', async (ctx) => {
@@ -170,6 +171,10 @@ router.post('/login', async (ctx) => {
   ctx.body = resBody;
 });
 router.post('/user/api/checkusername', async (ctx) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
   let body = ctx.request.body;
   let user = {
     username: body.username,
@@ -332,7 +337,6 @@ router.get('/user/api/state', async (ctx) => {
   }
 
 })
-
 router.get('/user/api/clear', async (ctx) => {
     ctx.response.header = {
       "Access-Control-Allow-Origin": "*",
@@ -346,20 +350,63 @@ router.get('/user/api/clear', async (ctx) => {
   }
 );
 
-//此处是迷乱中写的session 验证 未验证 不可信
-router.post('/user/api/del/:username', async (ctx) => {
-  var username = ctx.params.username;
-  var id = ctx.request.body.id;
-  if (ctx.session.current_user.username == username) {
-    UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}, function (err, doc) {
-      if (err) {
-        console.log(err);
-      }
-      console.log(doc);
-    })
+router.post('/user/api/edi/',async(ctx)=>{
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var username = ctx.session.current_user.username;
+  var id = ctx.request.body._id
+  var result1,result2;
+  try {
+    result1=await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
+    result2=await UserModel.update({'username': username}, {$push: {"accounts": ctx.request.body}}).exec();
+  }catch (err){
+    console.log(err);
   }
+  if(result1.nModified==1&&result2.nModified==1){
+    ctx.body={
+      type:'success',
+      message:'edit success'
+    }
+  }
+  else{
+    ctx.body={
+      type:'error',
+      message:'edit fail'
+    }
+  }
+
+
+
 });
 
+//此处是迷乱中写的session 验证 未验证 不可信
+router.post('/user/api/del/', async (ctx) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  var username = ctx.session.current_user.username;
+  var id = ctx.request.body.id;
+  var body = {}
+  try {
+    var doc = await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
+  }
+  catch (err) {
+    console.log("del have a big error")
+  }
+  if (doc.nModified == 0) {
+    body.type = 'error';
+    body.message = 'delete error'
+  }
+  else {
+    body.type = 'success';
+    body.message = 'delete success';
+  }
+  ctx.body = body;
+
+})
 app
   .use(router.routes())
   .use(router.allowedMethods());

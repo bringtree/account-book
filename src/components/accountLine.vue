@@ -3,27 +3,45 @@
   <section class="timeline-container timeline">
     <div class="submenu">
       <el-checkbox-group v-model="stateMode" class="lf">
-        <el-checkbox label="收入"></el-checkbox>
-        <el-checkbox label="清账收入"></el-checkbox>
-        <el-checkbox label="支出"></el-checkbox>
-        <el-checkbox label="清账支出"></el-checkbox>
+        <el-checkbox label="收入" style="color:#75ce66"></el-checkbox>
+        <el-checkbox label="支出" style="color:#f0ca45"></el-checkbox>
+        <el-checkbox label="已经清账" style="color:#c03b44"></el-checkbox>
+        <el-checkbox label="未清的账" style="color:#00bbff"></el-checkbox>
       </el-checkbox-group>
 
-      <div class="rf">
-        <el-radio class="radio" v-model="sortMode" label="date">按时间排序</el-radio>
-        <el-radio class="radio" v-model="sortMode" label="money">按金额排序</el-radio>
-        <el-radio class="radio" v-model="sortMode" label="status">按类型排序</el-radio>
+      <div class="block rf">
+        <el-date-picker
+                v-model="mydate"
+                type="daterange"
+                align="right"
+                placeholder="选择日期范围"
+                :picker-options="pickerOptions2">
+        </el-date-picker>
       </div>
-      <div class="clear"></div>
     </div>
+    <div class="sortMode lf clear">
+      <el-radio class="radio" v-model="factor.sortMode" label="date">按时间排序</el-radio>
+      <el-radio class="radio" v-model="factor.sortMode" label="money">按金额排序</el-radio>
+      <el-radio class="radio" v-model="factor.sortMode" label="status">按类型排序</el-radio>
+    </div>
+    <div class="clear"></div>
 
-    <div v-for="point in account" class="timeline-block">
+    <div v-for="point in showAccount" class="timeline-block">
       <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
       </div>
       <div class="timeline-content">
-        <h2>{{point.thing}}</h2>
-        <p>{{point.money}}</p>
-        <span>{{point.date}}</span>
+        <div v-if=" point.status != '4' " style="display: inline;">
+          <h2 @click="edit(point.thing,'thing',point)" class="edit">Thing:{{point.thing}}</h2>
+          <p @click="edit(point.money,'money',point)" class="edit"> Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
+          <span @click="edit(point.date,'date',point)" class="edit">Data:{{point.date}}</span>
+          <el-button :plain="true" type="danger" class="rf" @click="del(point)">删除</el-button>
+        </div>
+        <div v-if=" point.status == '4' " style="display: inline;">
+          <h2>Thing:{{point.thing}}</h2>
+          <p> Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
+          <span>Data:{{point.date}}</span>
+        </div>
+
       </div>
     </div>
   </section>
@@ -34,66 +52,219 @@
 
     data(){
       return {
-        account: [],
-        color: ["green", "red", "yellow", 'blue'],
-        sortMode: '1',
-        stateMode: ['0', '收入', '清账收入', '支出', '清账支出'],
-        stateCode:[]
+        pickerOptions2: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+        showAccount: [],
+        color: ["green", "yellow", "red", 'blue'],
+        stateMode: ['0', '收入', '支出', '已经清账', '未清的账'],
+        mydate: '',
+
+        factor: {
+          account: [],
+          sortCode: '1',
+          stateCode: ['0', '1', '2', '3', '4'],
+          sortMode: '1',
+          dateMode: ['0', '999999999999999'],
+        },
+
+
       }
     },
     watch: {
-      sortMode: function (value) {
-        console.log(value);
-        if (value == 'date') {
-          this.account.sort(function (a, b) {
-            return b.date.localeCompare(a.date);
-          })
-        }
-        if (value == 'money') {
-          this.account.sort(function (a, b) {
-            return b.money > a.money;
-          })
-        }
-        if (value == 'status') {
-          this.account.sort(function (a, b) {
-            return b.status < a.status
-          })
-        }
+
+      mydate: function (value) {
+        var date = new Array();
+        date[0] = value[0].toISOString();
+        date[1] = value[1].toISOString();
+        this.factor.dateMode = date;
+        return value;
       },
+      factor: {
+        handler: function (v) {
+          var account = v.account.slice();
+          var sortCode = v.sortCode;
+          var stateCode = v.stateCode;
+          var sortMode = v.sortMode;
+          var dateMode = v.dateMode;
+
+          var state = function (account, value) {
+            var result = [];
+            for (var i = 1; i < stateCode.length; i++) {
+              for (var j = 0; j < account.length; j++) {
+                if (account[j].status == stateCode[i]) {
+                  result.push(account[j]);
+                }
+              }
+            }
+            return result;
+          };
+
+          var time = function (account, dateMode) {
+            var result = [];
+            for (var j = 0; j < account.length; j++) {
+              if (account[j].date >= dateMode[0] && account[j].date <= dateMode[1])
+                result.push(account[j]);
+            }
+            return result;
+
+          }
+
+          var sort = function (account, value) {
+            if (value == 'date') {
+              account.sort(function (a, b) {
+                return b.date.localeCompare(a.date);
+              })
+            }
+            if (value == 'money') {
+              account.sort(function (a, b) {
+                return b.money > a.money;
+              })
+            }
+            if (value == 'status') {
+              account.sort(function (a, b) {
+                return b.status < a.status
+              })
+            }
+          };
+
+          account = state(account, stateCode);
+
+          try {
+            account = time(account, dateMode);
+
+          }
+          catch (err) {
+            account = []
+
+          }
+
+          sort(account, sortMode);
+          this.showAccount = account
+        },
+        deep: true
+      },
+
       stateMode: function (state) {
         var type = new Array();
         type.push('0');
-        var foo = function (chineseType,numType) {
-          if (state.indexOf(chineseType) > 0) {
+
+        var foo = function (chineseType, numType) {
+          if (state.findIndex((v) => {
+              return v == chineseType;
+            }) > 0) {
             if (type.indexOf(numType) < 0) {
               type.push(numType);
             }
-          }else{
+          } else {
             if (type.indexOf(numType) > 0) {
               type.pop(numType);
             }
           }
         };
-        foo('收入','1');
-        foo('清账收入','2');
-        foo('支出','3');
-        foo('清账支出','4');
-        this.stateCode = type;
-        // stateMode ->  type -> <- account[] <- time
+        foo('收入', '1');
+        foo('支出', '2');
+        foo('已经清账', '3');
+        foo('未清的账', '4');
+
+        this.factor.stateCode = type;
+
       }
     },
-    methods: {},
-    computed:{
-      account:function (value) {
-        let stateCode = this.stateCode
-//          return value
-        }
+    methods: {
+      del: function (event) {
+        var that = this;
+
+        var pos = that.factor.account.findIndex((ele) => {
+          return ele._id == event._id;
+        });
+
+        this.$http.post('http://localhost:8080/user/api/del/', {id: event._id}).then(function (res) {
+          if (res.status == 200) {
+            that.$message({
+              showClose: true,
+              type: res.data.type,
+              message: res.data.message
+            });
+
+            that.factor.account.splice(pos, 1);
+          }
+          else {
+            that.$message({
+              showClose: true,
+              type: "error",
+              message: "check your network"
+            })
+          }
+        });
+        console.log(that.factor.account);
+      },
+
+
+      edit(v, type, point) {
+        this.$prompt('原数据是' + v + ',请输入你要修改的数据', '编辑修改', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({value}) => {
+
+          if (value == null) {
+            value = v;
+          }
+          point[type] = value;
+          var that = this;
+          this.$http.post("http://localhost:8080/user/api/edi", point).then(function (res) {
+            that.$message({
+              type: res.data.type,
+              message: res.data.message
+            });
+
+
+          });
+
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消输入'
+          });
+        });
+      }
+
+
+    },
+    computed: {
+
     },
     mounted: function () {
       var that = this;
       this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
-        that.account = res.data;
-      })
+        that.factor.account = res.data;
+      });
+    },
+    updated: function () {
     }
 
   }
@@ -122,16 +293,16 @@
     margin-bottom: 2em;
   }
 
-  .timeline::before {
-    /* this is the vertical line */
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: 18px;
-    height: 100%;
-    width: 4px;
-    background: rgb(32, 160, 255);
-  }
+  /*.timeline::before {*/
+  /*!* this is the vertical line *!*/
+  /*content: '';*/
+  /*position: absolute;*/
+  /*top: 10%;*/
+  /*left: 18px;*/
+  /*height: 100%;*/
+  /*width: 4px;*/
+  /*background: rgb(32, 160, 255);*/
+  /*}*/
 
   @media only screen and (min-width: 1170px) {
     .timeline {
@@ -327,6 +498,10 @@
       -moz-animation: bounce-2-inverse 0.6s;
       animation: bounce-2-inverse 0.6s;
     }
+  }
+
+  .edit:hover {
+    color: rgb(104, 151, 187);
   }
 
 </style>

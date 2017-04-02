@@ -9,8 +9,8 @@
           <template slot="title">我的账单</template>
           <el-menu-item index="/menu/accountline">总览
           </el-menu-item>
-          <el-menu-item index="/menu/">未清的帐
-          </el-menu-item>
+          <!--<el-menu-item index="/menu/">未清的帐-->
+          <!--</el-menu-item>-->
         </el-submenu>
         <el-menu-item index="/menu/">统计
         </el-menu-item>
@@ -29,10 +29,14 @@
 </template>
 
 <script type="text/ecmascript-6">
+
+  import{mapGetters,mapActions} from 'vuex'
+
+
   export default{
     data() {
       return {
-        activeIndex: '1'
+        activeIndex: '1',
       };
     },
     methods: {
@@ -41,7 +45,14 @@
           this.$http.get("/user/api/clear")
         }
       }
-    }
+    },
+    mounted: function () {
+      var that = this;
+      this.$http.get("http://localhost:8080/user/api/allcome/xiao").then(function (res) {
+        that.$store.commit('u')
+        that.account = res.data;
+      });
+    },
   }
 </script>
 

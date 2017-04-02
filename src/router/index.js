@@ -8,7 +8,6 @@ import accountExart from '../components/accountExart.vue'
 import accountChart from '../components/accountChart.vue'
 import menu from '../components/menu.vue'
 
-
 Vue.use(Router)
 
 export default new Router({
