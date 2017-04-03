@@ -19,13 +19,14 @@ var UserSchema = new mongoose.Schema({
   date: {type: Date, default: Date.now},
   money: {type: Number, default: 0},
   accounts: [{
-    status: {type: Number, require: true}, //1代表收入 2代表支付 3代表清账支出 4代表清账收入
+    status: {type: Number, require: true},
     date: {type: Date, require: true},
     thing: {type: String, require: true},
     money: {type: Number, require: true}
   }]
-  //经过研究思考 这边实际上 应该用范式的,但是时间太赶 实在没办法了
 })
+
+//经过研究思考 这边实际上 应该用范式的,但是时间太赶 实在没办法了
 
 
 

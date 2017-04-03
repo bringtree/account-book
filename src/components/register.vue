@@ -84,7 +84,7 @@
         const that = this;
         this.$http.post('/register', this.ruleForm2)
           .then(function (res) {
-            console.log(res)
+            console.log(res);
               that.$message({
                 showClose: true,
                 message: res.data.message,

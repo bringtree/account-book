@@ -17,7 +17,6 @@ const cors = require("koa-cors");
 app.use(bodyParser());
 app.use(cors());
 
-
 //session
 app.keys = ['keys', 'keykeys'];
 app.use(session({
@@ -84,15 +83,15 @@ var test = new UserModel({
       }]
   }
 );
-
+//
 // test.save(function (err, log) {
 //   if (err) {
 //     console.log('save error:' + err);
 //   } else
 //     console.log('save success\n' + log);
 // });
+// /* end */
 /* end */
-
 
 router.post('/register', async (ctx) => {
   ctx.response.header = {
@@ -170,6 +169,8 @@ router.post('/login', async (ctx) => {
   }
   ctx.body = resBody;
 });
+
+
 router.post('/user/api/checkusername', async (ctx) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
@@ -335,20 +336,18 @@ router.get('/user/api/state', async (ctx) => {
     }
   }
 
-})
+});
 router.get('/user/api/clear', async (ctx) => {
-    ctx.response.header = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": "true"
-    };
-    ctx.session = null;
-    ctx.body = {
-      "type": "success",
-      "message": "clear cookie success"
-    }
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+  ctx.session = null;
+  ctx.body = {
+    "type": "success",
+    "message": "clear cookie success"
   }
-);
-
+});
 router.post('/user/api/edi/', async (ctx) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
@@ -378,8 +377,6 @@ router.post('/user/api/edi/', async (ctx) => {
 
 
 });
-
-//此处是迷乱中写的session 验证 未验证 不可信
 router.post('/user/api/del/', async (ctx) => {
   ctx.response.header = {
     "Access-Control-Allow-Origin": "*",
@@ -387,12 +384,13 @@ router.post('/user/api/del/', async (ctx) => {
   };
   var username = ctx.session.current_user.username;
   var id = ctx.request.body.id;
-  var body = {}
+  var body = {};
+  var doc;
   try {
-    var doc = await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
+    doc = await UserModel.update({'username': username}, {$pull: {"accounts": {"_id": id}}}).exec();
   }
   catch (err) {
-    console.log("del have a big error")
+    console.log("del have a big error");
   }
   if (doc.nModified == 0) {
     body.type = 'error';
@@ -404,7 +402,163 @@ router.post('/user/api/del/', async (ctx) => {
   }
   ctx.body = body;
 
-})
+});
+router.get('/user/api/hxji', async (ctx) => {
+
+  // var a = await UserModel.find({'accounts.status':'1'}).exec();
+
+  // UserModel.aggregate().unwind('accounts').match({'accounts.status':'1'}).sort({'accounts.money':1}).skip(0).limit(10).group({_id:"$_id",accounts:{$push:"$accounts"}}).exec()
+  // var b =await UserModel.aggregate().unwind('accounts').exec()   //这条是正常
+  // var b = await UserModel.aggregate().unwind('accounts').match({'accounts.status':'1'}).exec(); //这条匹配到是空的
+
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true"
+  };
+
+  var b = await UserModel.aggregate().unwind('accounts').sort({'accounts.money': 1}).group({
+    _id: "$_id",
+    status: {$push: "$accounts"},
+    name: {$push: "$name"},
+    username: {$push: '$username'}
+  }).exec()
+
+  // sort({'accounts.money':1}).skip(0).limit(10).group({_id:"$_id",accounts:{$push:"$accounts"}}).
+  var data = [];
+  for (var i = 0; i < b.length; i++) {
+    for (var j = 0; j < b[i].status.length; j++) {
+      if (b[i].status[j].status == 4) {
+        b[i].status[j].name = b[i].name[j];
+        b[i].status[j].username = b[i].username[j];
+        data.push(b[i].status[j]);
+      }
+    }
+  }
+  ctx.body = data;
+});
+
+
+router.post('/boss/access', async (ctx) => {
+
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    'Access-Control-Allow-Methods': 'POST,GET'
+  };
+
+  var username = ctx.session.current_user.username;
+  var power = await UserModel.findByUsername(username);
+  power = power.admin;
+
+  var data = ctx.request.body;
+
+  var form = {
+    'date': data.date,
+    'status': '3',
+    'thing': data.thing,
+    'money': data.money,
+    '_id': data._id
+  }
+  var result1, result2;
+  if (power == true) {
+    try {
+      result1 = await UserModel.update({'username': data.username}, {$pull: {"accounts": {"_id": data._id}}}).exec();
+      result2 = await UserModel.update({'username': data.username}, {$push: {"accounts": form}}).exec();
+    } catch (err) {
+      console.log(err);
+    }
+    if (result1.nModified == 1 && result2.nModified == 1) {
+      ctx.body = {
+        type: 'success',
+        message: 'edit success'
+      }
+    }
+    else {
+      ctx.body = {
+        type: 'error',
+        message: 'try again?'
+      }
+    }
+
+
+  } else {
+    ctx.body = {
+      type: 'error',
+      message: 'sorry,my dear admin'
+    }
+  }
+});
+router.post('/boss/reject', async (ctx) => {
+
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    'Access-Control-Allow-Methods': 'POST,GET'
+  };
+
+  var username = ctx.session.current_user.username;
+  var power = await UserModel.findByUsername(username);
+  power = power.admin;
+  var doc;
+  var body = ctx.request.body;
+  if (power == true) {
+
+    try {
+      doc = await UserModel.update({'username': body.username}, {$pull: {"accounts": {"_id": body._id}}}).exec();
+    }
+    catch (err) {
+      ctx.body = {
+        type: 'error',
+        message: 'sorry,my dear admin'
+      };
+      console.log("del have a big error");
+    }
+
+    if (doc.nModified == 0) {
+      ctx.body = {
+        type: 'error',
+        message: 'delete error'
+      }
+    }
+    else {
+      ctx.body = {
+        type: 'success',
+        message: 'delete success'
+      }
+    }
+
+  } else {
+    ctx.body = {
+      type: 'error',
+      message: 'sorry,my dear admin'
+    }
+  }
+
+});
+router.get('/boss/check', async (ctx) => {
+  ctx.response.header = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    'Access-Control-Allow-Methods': 'POST,GET'
+  };
+  var username = ctx.session.current_user.username;
+  try {
+    var power = await UserModel.findByUsername(username);
+    power = power.admin;
+  }
+  catch (err){}
+  if (power == true) {
+    ctx.body ={
+      type: "true"
+    };
+  }
+  else {
+    ctx.body = {
+      type: "false"
+    };;
+  }
+});
+
 app
   .use(router.routes())
   .use(router.allowedMethods());

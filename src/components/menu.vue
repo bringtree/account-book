@@ -5,19 +5,19 @@
                @select="handleSelect">
         <el-menu-item index="/menu/addcount">添加账单
         </el-menu-item>
-        <el-submenu index="1">
-          <template slot="title">我的账单</template>
+        <!--<el-submenu index="1">-->
+          <!--<template slot="title">我的账单</template>-->
           <el-menu-item index="/menu/accountline">总览
           </el-menu-item>
           <!--<el-menu-item index="/menu/">未清的帐-->
           <!--</el-menu-item>-->
-        </el-submenu>
-        <el-menu-item index="/menu/">统计
+        <!--</el-submenu>-->
+        <el-menu-item index="/menu/accountchart">统计
         </el-menu-item>
 
         <el-submenu style="float:right" index="2">
           <el-menu-item index="/login">登出</el-menu-item>
-          <el-menu-item index="/login">后台</el-menu-item>
+          <el-menu-item index="/menu/superpower">后台</el-menu-item>
         </el-submenu>
       </el-menu>
     </div>

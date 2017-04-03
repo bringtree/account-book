@@ -14,7 +14,6 @@ var state = {
 var mutations = {
   update(state, v){
     state.account = v.account;
-    console.log(state.account);
   }
 };
 

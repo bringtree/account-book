@@ -17,12 +17,28 @@ Axios.defaults.headers.common["Access-Control-Allow-Credentials"] = "true";
 
 Vue.prototype.$http = Axios;
 
+
 router.beforeEach((to, from, next) => {
   if (to.path != '/register') {
     Axios.get('/user/api/state')
       .then(function (res) {
         if (res.data.type == "success") {
-          next();
+          if (to.path == '/') {
+            next('/menu/accountline');
+          }
+          else if (to.path == '/menu/superpower') {
+            Axios.get('/boss/check').then(function (res) {
+              if (res.data.type == 'true') {
+                next('/menu/superpower');
+              }
+              else {
+                next('/menu/accountline');
+              }
+            });
+          }
+          else {
+            next();
+          }
         }
         else {
           next('/login')
@@ -30,9 +46,8 @@ router.beforeEach((to, from, next) => {
       })
   }
   next();
-
-
 });
+
 
 /* eslint-disable no-new */
 new Vue({

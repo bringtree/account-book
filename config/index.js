@@ -39,6 +39,10 @@ module.exports = {
       "/user":{
         target: 'http://localhost:3000',
         changeOrigin: true
+      },
+      "/boss":{
+        target: 'http://localhost:3000',
+        changeOrigin: true
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

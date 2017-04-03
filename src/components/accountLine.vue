@@ -30,13 +30,14 @@
       <div class="timeline-img" :class="['timeline-img',point.status===undefined?'red':color[point.status-1]]">
       </div>
       <div class="timeline-content">
-        <div v-if=" point.status != '4' " style="display: inline;">
+        <div v-if=" point.status != '3' " style="display: inline;">
           <h2 @click="edit(point.thing,'thing',point)" class="edit">Thing:{{point.thing}}</h2>
-          <p @click="edit(point.money,'money',point)" class="edit"> Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
+          <p @click="edit(point.money,'money',point)" class="edit">
+            Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
           <span @click="edit(point.date,'date',point)" class="edit">Data:{{point.date}}</span>
           <el-button :plain="true" type="danger" class="rf" @click="del(point)">删除</el-button>
         </div>
-        <div v-if=" point.status == '4' " style="display: inline;">
+        <div v-if=" point.status == '3' " style="display: inline;">
           <h2>Thing:{{point.thing}}</h2>
           <p> Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
           <span>Data:{{point.date}}</span>
@@ -48,7 +49,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import{mapGetters,mapActions} from 'vuex'
+  import{mapGetters, mapActions} from 'vuex'
 
   export default{
 
@@ -84,7 +85,7 @@
         showAccount: [],
         color: ["green", "yellow", "red", 'blue'],
         stateMode: ['0', '收入', '支出', '已经清账', '未清的账'],
-        mydate: '',
+        mydate: ['Mon Jan 02 2016 16:22:47 GMT+0800 (CST)', 'Mon Jan 02 2018 16:22:47 GMT+0800 (CST)'],
 
         factor: {
           account: [],
@@ -101,14 +102,34 @@
 
       mydate: function (value) {
         var date = new Array();
-        date[0] = value[0].toISOString();
-        date[1] = value[1].toISOString();
+        try {
+          date[0] = value[0].toISOString();
+          date[1] = value[1].toISOString();
+        }
+        catch (err) {
+        }
         this.factor.dateMode = date;
         return value;
       },
       factor: {
         handler: function (v) {
-          var account = v.account.slice();
+          const deepCopy = function (o) {
+            if (o instanceof Array) {
+              var n = [];
+              for (var i = 0; i < o.length; ++i)
+                n[i] = deepCopy(o[i]);
+              return n;
+            }
+            else if (o instanceof Object) {
+              var n = {};
+              for (var i in o)
+                n[i] = deepCopy(o[i]);
+              return n;
+            }
+            else    return o;
+          }
+
+          var account = deepCopy(v.account);
           var sortCode = v.sortCode;
           var stateCode = v.stateCode;
           var sortMode = v.sortMode;
@@ -133,8 +154,7 @@
                 result.push(account[j]);
             }
             return result;
-
-          }
+          };
 
           var sort = function (account, value) {
             if (value == 'date') {
@@ -212,7 +232,6 @@
               type: res.data.type,
               message: res.data.message
             });
-
             that.factor.account.splice(pos, 1);
           }
           else {
@@ -257,13 +276,11 @@
 
 
     },
-    computed: {
-
-    },
+    computed: {},
     mounted: function () {
       var that = this;
       this.$http.get("http://localhost:8080/user/api/allcome/").then(function (res) {
-        that.$store.commit('update',{account:res.data})
+        that.$store.commit('update', {account: res.data})
         that.factor.account = res.data;
       });
     }

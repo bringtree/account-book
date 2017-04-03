@@ -4,11 +4,11 @@ import Register from '@/components/register'
 import Login from '@/components/login'
 import Account from '@/components/accountLine'
 import addAccount from '../components/addAccount'
-import accountExart from '../components/accountExart.vue'
 import accountChart from '../components/accountChart.vue'
 import menu from '../components/menu.vue'
+import superPower from '../components/superPower.vue'
 
-Vue.use(Router)
+  Vue.use(Router)
 
 export default new Router({
   routes: [
@@ -33,12 +33,12 @@ export default new Router({
           component:Account
         },
         {
-          path:"accountextra",
-          component:accountExart
-        },
-        {
           path:"accountchart",
           component:accountChart
+        },
+        {
+          path:'superpower',
+          component:superPower
         }
       ]
     }
