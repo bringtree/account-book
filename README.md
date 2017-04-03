@@ -1,11 +1,23 @@
 # finance
-应该2周内能完成
+v1.0
+http://118.89.33.168/index.html#/menu/accountline
+管理员号
+用户名 admin 密码admin
 
-记录下目前问题
-store 未建立 
-部分地方 get中用着 xiao 没 补 
-明天 c语言答辩 先告一段落
-路由跳转 before 先留 到时候想想要写login 好还是 register好
+使用手册
+
+只有管理员才可以 清账
+
+修改信息的话 点击 文字就行了  ，删除的话那里有个按钮
+
+清账后的数据是不能被修改 和 删除的
+
+就这样了
+mongodb数据库 mongod mongo
+
+启动 server目录下 npm install   
+                node app
+主目录 npm run dev
 
 > A Vue.js project
 
