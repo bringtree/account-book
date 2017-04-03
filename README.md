@@ -19,28 +19,31 @@ mongodb数据库 mongod mongo
                 node app
 主目录 npm run dev
 
-> A Vue.js project
 
-## Build Setup
+一个 记账本 
 
-``` bash
-# install dependencies
-npm install
+1前端Vue2 框架  
+	组件主要用了 element 
+	图表用了echarts的饼图
+	用了md5在前端进行加密
+	ajax用axios 
+	账单信息利用vuex存储在 store中，这是一个单页面应用，所以就不要刷新搞事情了
 
-# serve with hot reload at localhost:8080
-npm run dev
+2后端用nodejs(koa2框架)
+	登陆验证用的是cookie-session(这里有点小问题 是中间件的问题 那个中间件有时候会出现3个 4个 甚至更多的cookie 再用户注册的时候 所以。。。遇到什么异常 客户端 清除下cookie就好了)
+	每次数据库操作都会进行一次验证 （为了检验权限）
+	数据库操作用的是mongoose模块,深坑  没有中文文档 。连官方文档都有些问题 要去查mongodb的文档 然后来推出用法，官方文档有括号不匹配 等等 问题。。。。
+	这次在用聚合操作就深陷该坑
+	koa2框架虽然B格高 但是用的人少 出错极其麻烦
+	当用户点击退出时清除session，如果用户没有点击 下次可以免密码登陆
+	用上了async await 等等B格高的操作 应对异步操作
+	
+3数据库mongodb
+	session存储在其中
+	用户的信息也是
 
-# build for production with minification
-npm run build
+4服务器
+	腾讯云
 
-# build for production and view the bundle analyzer report
-npm run build --report
 
-# run e2e tests
-npm run e2e
 
-# run all tests
-npm test
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
