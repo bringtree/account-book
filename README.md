@@ -17,7 +17,8 @@ mongodb数据库 mongod mongo
 
 启动 server目录下 npm install   
                 node app
-主目录 npm run dev
+主目录  npm install
+npm run dev
 
 
 一个 记账本 
