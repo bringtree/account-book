@@ -80,24 +80,24 @@
           _id: row._id,
           thing: row.thing
         };
-        try {
-          that.$http.post('http://localhost:8080/boss/access', form).then(function (res) {
+        that.$http.post('/boss/access', form)
+          .then(function (res) {
             that.$message({
               showClose: true,
               type: res.data.type,
               message: res.data.message
             });
-            if(res.data.type=='success'){
-              that.tableData.splice(index,1)
+            if (res.data.type == 'success') {
+              that.tableData.splice(index, 1)
             }
           })
-        } catch (err) {
-          that.$message({
-            showClose: true,
-            type: 'error',
-            message: "check your network"
+          .catch((err) => {
+            that.$message({
+              showClose: true,
+              type: 'error',
+              message: "check your network"
+            })
           })
-        }
       },
       handleDelete(index, row) {
         const that = this;
@@ -105,32 +105,33 @@
           username: row.username,
           _id: row._id,
         };
-        try {
-          that.$http.post('http://localhost:8080/boss/reject', form).then(function (res) {
+        that.$http.post('/boss/reject', form)
+          .then(function (res) {
             that.$message({
               showClose: true,
               type: res.data.type,
               message: res.data.message
             });
-            if(res.data.type=='success'){
-              that.tableData.splice(index,1)
+            if (res.data.type == 'success') {
+              that.tableData.splice(index, 1)
             }
           })
-        } catch (err) {
-          that.$message({
-            showClose: true,
-            type: 'error',
-            message: "check your network"
+          .catch((err) => {
+            that.$message({
+              showClose: true,
+              type: 'error',
+              message: "check your network"
+            })
           })
-        }
 
       }
     },
     mounted: function () {
       const that = this;
-      this.$http.get('http://localhost:8080/user/api/hxji').then(function (res) {
-        that.tableData = res.data;
-      })
+      this.$http.get('/user/api/hxji')
+        .then(function (res) {
+          that.tableData = res.data;
+        })
 
     }
   }

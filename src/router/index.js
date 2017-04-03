@@ -8,7 +8,7 @@ import accountChart from '../components/accountChart.vue'
 import menu from '../components/menu.vue'
 import superPower from '../components/superPower.vue'
 
-  Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
@@ -29,18 +29,19 @@ export default new Router({
           component: addAccount,
         },
         {
-          path:'accountline',
-          component:Account
+          path: 'accountline',
+          component: Account
         },
         {
-          path:"accountchart",
-          component:accountChart
+          path: "accountchart",
+          component: accountChart
         },
         {
-          path:'superpower',
-          component:superPower
+          path: 'superpower',
+          component: superPower
         }
       ]
     }
   ]
 })
+

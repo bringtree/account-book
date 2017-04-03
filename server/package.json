@@ -5,6 +5,7 @@
     "bluebird": "^3.5.0",
     "kcors": "^2.2.1",
     "koa": "^2.1.2",
+    "koa-bodyparser": "^4.2.0",
     "koa-csrf": "^3.0.5",
     "koa-generic-session": "^1.11.5",
     "koa-generic-session-mongo": "^0.3.1",

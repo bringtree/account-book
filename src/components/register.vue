@@ -19,6 +19,10 @@
 </template>
 
 <script>
+  import router from '../router/index'
+  import md5 from 'md5'
+
+
   export default {
     data() {
       var checkUser = (rule, value, callback) => {
@@ -26,7 +30,6 @@
           return callback(new Error('称呼不能为空'));
         }
         return callback();
-
       };
       var checkUsername = (rule, value, callback) => {
         if (!value) {
@@ -82,14 +85,23 @@
       },
       submit: function () {
         const that = this;
-        this.$http.post('/register', this.ruleForm2)
+        var form ={
+          user: that.ruleForm2.user,
+          username:that.ruleForm2.username,
+          password: md5(that.ruleForm2.password)
+
+        }
+
+        this.$http.post('/register', form)
           .then(function (res) {
-            console.log(res);
               that.$message({
                 showClose: true,
                 message: res.data.message,
                 type: res.data.type
               });
+              if(res.data.message='success'){
+                router.push("menu");
+              }
             }
           );
       }
@@ -98,8 +110,8 @@
 </script>
 
 <style scoped>
-  #register{
-    margin-top:10%;
-    margin-right:15%;
+  #register {
+    margin-top: 10%;
+    margin-right: 15%;
   }
 </style>

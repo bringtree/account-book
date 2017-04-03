@@ -9,10 +9,8 @@
               :picker-options="pickerOptions2">
       </el-date-picker>
     </div>
-
     <div>总收入:{{pieData[0].value+pieData[2].value}}</div>
     <div>总支出:{{pieData[1].value+pieData[3].value}}</div>
-
     <div id="charts" style="margin:0 auto;">
       <div id="main" :style="{width:'600px',height:'400px'}"></div>
     </div>
@@ -64,8 +62,6 @@
         ]
       }
     },
-
-
     watch: {
       mydate: function () {
         const deepCopy = function (o) {
@@ -100,6 +96,7 @@
         catch (err) {
         }
       },
+
       account: function () {
         const deepCopy = function (o) {
           if (o instanceof Array) {

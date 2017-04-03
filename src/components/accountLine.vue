@@ -33,26 +33,27 @@
         <div v-if=" point.status != '3' " style="display: inline;">
           <h2 @click="edit(point.thing,'thing',point)" class="edit">Thing:{{point.thing}}</h2>
           <p @click="edit(point.money,'money',point)" class="edit">
-            Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
+            Money:{{((point.status==1)||(point.status==3))?'+':'-'}}{{point.money}}</p>
           <span @click="edit(point.date,'date',point)" class="edit">Data:{{point.date}}</span>
           <el-button :plain="true" type="danger" class="rf" @click="del(point)">删除</el-button>
         </div>
         <div v-if=" point.status == '3' " style="display: inline;">
           <h2>Thing:{{point.thing}}</h2>
-          <p> Money:{{(point.status==(1|3))?'+':'-'}}{{point.money}}</p>
+          <p> Money:{{((point.status==1)||(point.status==3))?'+':'-'}}{{point.money}}</p>
           <span>Data:{{point.date}}</span>
+          <span>{{(point.control==0)?'':'清账员:'}}</span>
+          <span>{{(point.control==0)?'':point.control}}</span>
         </div>
 
       </div>
     </div>
   </section>
 </template>
-
+//toLocaleString()
 <script type="text/ecmascript-6">
   import{mapGetters, mapActions} from 'vuex'
 
   export default{
-
     data(){
       return {
         pickerOptions2: {
@@ -99,7 +100,6 @@
       }
     },
     watch: {
-
       mydate: function (value) {
         var date = new Array();
         try {
@@ -111,6 +111,7 @@
         this.factor.dateMode = date;
         return value;
       },
+
       factor: {
         handler: function (v) {
           const deepCopy = function (o) {
@@ -146,7 +147,6 @@
             }
             return result;
           };
-
           var time = function (account, dateMode) {
             var result = [];
             for (var j = 0; j < account.length; j++) {
@@ -155,7 +155,6 @@
             }
             return result;
           };
-
           var sort = function (account, value) {
             if (value == 'date') {
               account.sort(function (a, b) {
@@ -175,21 +174,20 @@
           };
 
           account = state(account, stateCode);
-
           try {
             account = time(account, dateMode);
-
           }
           catch (err) {
             account = []
-
           }
-
           sort(account, sortMode);
-          this.showAccount = account
+
+          this.showAccount = account;
         },
         deep: true
       },
+
+
 
       stateMode: function (state) {
         var type = new Array();
@@ -225,47 +223,42 @@
           return ele._id == event._id;
         });
 
-        this.$http.post('http://localhost:8080/user/api/del/', {id: event._id}).then(function (res) {
-          if (res.status == 200) {
-            that.$message({
-              showClose: true,
-              type: res.data.type,
-              message: res.data.message
-            });
-            that.factor.account.splice(pos, 1);
-          }
-          else {
-            that.$message({
-              showClose: true,
-              type: "error",
-              message: "check your network"
-            })
-          }
-        });
-        console.log(that.factor.account);
+        this.$http.post('/user/api/del/', {id: event._id})
+          .then(function (res) {
+            if (res.status == 200) {
+              that.$message({
+                showClose: true,
+                type: res.data.type,
+                message: res.data.message
+              });
+              that.factor.account.splice(pos, 1);
+            }
+            else {
+              that.$message({
+                showClose: true,
+                type: "error",
+                message: "check your network"
+              })
+            }
+          });
       },
-
 
       edit(v, type, point) {
         this.$prompt('原数据是' + v + ',请输入你要修改的数据', '编辑修改', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         }).then(({value}) => {
-
           if (value == null) {
             value = v;
           }
           point[type] = value;
           var that = this;
-          this.$http.post("http://localhost:8080/user/api/edi", point).then(function (res) {
+          this.$http.post("/user/api/edi", point).then(function (res) {
             that.$message({
               type: res.data.type,
               message: res.data.message
             });
-
-
           });
-
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -273,18 +266,15 @@
           });
         });
       }
-
-
     },
-    computed: {},
     mounted: function () {
       var that = this;
-      this.$http.get("http://localhost:8080/user/api/allcome/").then(function (res) {
-        that.$store.commit('update', {account: res.data})
+      this.$http.get("/user/api/allcome/").then(function (res) {
+        that.$store.commit('update', {account: res.data});
         that.factor.account = res.data;
       });
-    }
 
+    }
   }
 
 </script>
@@ -310,17 +300,6 @@
     margin-top: 2em;
     margin-bottom: 2em;
   }
-
-  /*.timeline::before {*/
-  /*!* this is the vertical line *!*/
-  /*content: '';*/
-  /*position: absolute;*/
-  /*top: 10%;*/
-  /*left: 18px;*/
-  /*height: 100%;*/
-  /*width: 4px;*/
-  /*background: rgb(32, 160, 255);*/
-  /*}*/
 
   @media only screen and (min-width: 1170px) {
     .timeline {

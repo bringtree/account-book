@@ -25,17 +25,17 @@
                     :rules="[
       { required: true, message: 'date can\'t not be a null'},
     ]">
-            <el-date-picker
-              v-model="form.date"
-              type="datetime"
-              placeholder="选择日期时间"
-              style="width:100%">
-            </el-date-picker>
+        <el-date-picker
+                v-model="form.date"
+                type="datetime"
+                placeholder="选择日期时间"
+                style="width:100%">
+        </el-date-picker>
       </el-form-item>
       <el-form-item
-        label="money"
-        prop="money"
-        :rules="[
+              label="money"
+              prop="money"
+              :rules="[
       { required: true, message: 'money can\'t not be a null'},
       { type: 'number', message: 'money must be a number'}
     ]"
@@ -47,13 +47,6 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
-
-
-
-
-
-
-
   </div>
 </template>
 
@@ -74,42 +67,41 @@
       onSubmit()
       {
         var that = this;
-        if(this.form.thing&&this.form.status&&this.form.date&&this.form.money){
+        if (this.form.thing && this.form.status && this.form.date && this.form.money) {
           this.$http.post('/user/api/add/', this.form)
             .then(function (res) {
-              if(res.status==200){
+              if (res.status == 200) {
                 that.$message({
-                  showClose:true,
-                  type:res.data.type||"error",
-                  message:res.data.message
+                  showClose: true,
+                  type: res.data.type || "error",
+                  message: res.data.message
                 })
               }
 
             })
             .catch((err) => {
               that.$message({
-                showClose:true,
-                type:"error",
-                message:err
+                showClose: true,
+                type: "error",
+                message: err
               })
             })
-        }else{
+        } else {
           that.$message({
-            showClose:true,
-            type:"error",
-            message:"check out your input"
+            showClose: true,
+            type: "error",
+            message: "check out your input"
           })
         }
       }
     }
-
   }
 
 </script>
 
 <style scoped>
-#addCount{
-  margin-top: 30px;
-}
+  #addCount {
+    margin-top: 30px;
+  }
 
 </style>

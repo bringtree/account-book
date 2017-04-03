@@ -10,18 +10,31 @@ var state = {
   account: []
 };
 
+//
+// var mutations = {
+//   update(state, v){
+//     state.account = v.account;
+//   }
+// };
 
 var mutations = {
-  update(state, v){
+  update: function (state, v) {
     state.account = v.account;
   }
 };
 
+// var getters = {
+//   doneAccount: state => {
+//     return state.account;
+//   }
+// };
+
+
 var getters = {
-  doneAccount:state=>{
+  doneAccount: function (state) {
     return state.account;
   }
-}
+};
 
 export default new Vuex.Store({
   state,

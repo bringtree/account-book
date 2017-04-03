@@ -4,8 +4,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import Axios from 'axios'
 import store from './store'
-
-
 import router from './router/index'
 
 import ElementUI from 'element-ui'
