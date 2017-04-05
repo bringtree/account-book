@@ -216,6 +216,7 @@ router.get('/user/api/allcome/', async (ctx) => {
       var date = result1.accounts[i].date.toLocaleString();
       var result2 = {
         'control':result1.accounts[i].control,
+        'methods':result1.accounts[i].methods,
         'date': date,
         'status': result1.accounts[i].status,
         'thing': result1.accounts[i].thing,
@@ -380,7 +381,8 @@ router.post('/boss/access', async (ctx) => {
     'thing': data.thing,
     'money': data.money,
     '_id': data._id,
-    'control':username
+    'control':username,
+    'methods':data.methods
   }
   var result1, result2;
   if (power == true) {

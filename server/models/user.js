@@ -23,7 +23,8 @@ var UserSchema = new mongoose.Schema({
     date: {type: Date, require: true},
     thing: {type: String, require: true},
     money: {type: Number, require: true},
-    control:{type:String,default:0}
+    control:{type:String,default:0},
+    methods:{type:String,default:0}
   }]
 });
 

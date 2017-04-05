@@ -46,6 +46,7 @@
                 type="success"
                 @click="handleEdit(scope.$index, scope.row)">拨款
         </el-button>
+
         <el-button
                 size="small"
                 type="danger"
@@ -78,26 +79,41 @@
           username: row.username,
           status: row.status,
           _id: row._id,
-          thing: row.thing
+          thing: row.thing,
+          methods:''
         };
-        that.$http.post('/boss/access', form)
-          .then(function (res) {
-            that.$message({
-              showClose: true,
-              type: res.data.type,
-              message: res.data.message
-            });
-            if (res.data.type == 'success') {
-              that.tableData.splice(index, 1)
-            }
-          })
-          .catch((err) => {
-            that.$message({
-              showClose: true,
-              type: 'error',
-              message: "check your network"
+        this.$prompt('请输入清账方式', '清账方式', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({ value }) => {
+          form.methods = value||'现金';
+          that.$http.post('/boss/access', form)
+            .then(function (res) {
+              that.$message({
+                showClose: true,
+                type: res.data.type,
+                message: res.data.message
+              });
+              if (res.data.type == 'success') {
+                that.tableData.splice(index, 1)
+              }
             })
-          })
+            .catch((err) => {
+              that.$message({
+                showClose: true,
+                type: 'error',
+                message: "check your network"
+              })
+            });
+        }).catch((err) => {
+          this.$message({
+            showClose:true,
+            type: 'info',
+            message: '取消输入'
+          });
+        });
+
+
       },
       handleDelete(index, row) {
         const that = this;

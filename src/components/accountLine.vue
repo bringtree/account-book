@@ -43,6 +43,8 @@
           <span>Data:{{point.date}}</span>
           <span>{{(point.control==0)?'':'清账员:'}}</span>
           <span>{{(point.control==0)?'':point.control}}</span>
+          <span>{{(point.methods==0)?'':'清账方式:'}}</span>
+          <span>{{(point.methods==0)?'':point.methods}}</span>
         </div>
 
       </div>
@@ -128,7 +130,7 @@
               return n;
             }
             else    return o;
-          }
+          };
 
           var account = deepCopy(v.account);
           var sortCode = v.sortCode;

@@ -1,5 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 server/npm-debug.log
-/node_modules
-/server/node_modules
+/server/node_modules/
+/node_modules/
