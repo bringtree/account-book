@@ -1,6 +1,6 @@
 # finance
 v1.0
-http://www.bringtree.cn
+http://www.bringtree.cn(部署的不是这个记账本了。。。)
 管理员号   登陆后点击右上角  上面有后台   啊啊啊 
           修改 你就点击那些文字就好了 比如我要改100 我就点100 就可以改了 啊啊啊
 用户名 admin 密码admin
